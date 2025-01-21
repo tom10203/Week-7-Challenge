@@ -18,10 +18,17 @@ public class MainManager : MonoBehaviour
     
     private bool m_GameOver = false;
 
+    DataPersistance dp;
+    public Text bestScore;
+    bool saveScore = false;
     
     // Start is called before the first frame update
     void Start()
     {
+        dp = GameObject.FindGameObjectWithTag("DP").GetComponent<DataPersistance>();
+        dp.LoadData();
+        bestScore.text = "Best Score: " + dp.nameInput.text + " : " + dp.highScore.ToString();
+
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -66,11 +73,24 @@ public class MainManager : MonoBehaviour
     {
         m_Points += point;
         ScoreText.text = $"Score : {m_Points}";
+
+        if (m_Points > dp.highScore)
+        {
+            saveScore = true;
+
+            dp.highScore = m_Points;
+            bestScore.text = "Best Score: " + dp.nameInput.text + " : " + dp.highScore.ToString();
+        }
     }
 
     public void GameOver()
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+
+        if (saveScore)
+        {
+            dp.SaveData();
+        }
     }
 }
